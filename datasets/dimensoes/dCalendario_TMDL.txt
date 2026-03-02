@@ -1,0 +1,341 @@
+createOrReplace
+
+	table dim_calendario
+		dataCategory: Time
+
+		column data
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 01. Colunas Chave
+			summarizeBy: none
+			sourceColumn: data
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column data_key
+			dataType: int64
+			formatString: 0
+			displayFolder: 01. Colunas Chave
+			summarizeBy: none
+			sourceColumn: data_key
+
+			annotation SummarizationSetBy = Automatic
+
+		column ano_mes_key
+			dataType: int64
+			formatString: 0
+			displayFolder: 01. Colunas Chave
+			summarizeBy: none
+			sourceColumn: ano_mes_key
+
+			annotation SummarizationSetBy = Automatic
+
+		column ano_trimestre_key
+			dataType: int64
+			formatString: 0
+			displayFolder: 01. Colunas Chave
+			summarizeBy: none
+			sourceColumn: ano_trimestre_key
+
+			annotation SummarizationSetBy = Automatic
+
+		column ano_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 02. Ano
+			summarizeBy: none
+			sourceColumn: ano_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column ano_data_ini
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 02. Ano
+			summarizeBy: none
+			sourceColumn: ano_data_ini
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column ano_data_fim
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 02. Ano
+			summarizeBy: none
+			sourceColumn: ano_data_fim
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column mes_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column mes_periodo
+			dataType: int64
+			formatString: 0
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_periodo
+
+			annotation SummarizationSetBy = Automatic
+
+		column mes_data_ini
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_data_ini
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column mes_data_fim
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_data_fim
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column mes_dias_qtd
+			dataType: int64
+			formatString: 0
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_dias_qtd
+
+			annotation SummarizationSetBy = Automatic
+
+		column mes_nome
+			dataType: string
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_nome
+			sortByColumn: mes_num
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column mes_nome_abrev
+			dataType: string
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_nome_abrev
+			sortByColumn: mes_num
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column mes_ano_nome_abrev
+			dataType: string
+			displayFolder: 04. Mes
+			summarizeBy: none
+			sourceColumn: mes_ano_nome_abrev
+			sortByColumn: ano_mes_key
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column trimestre_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 03. Trimestre
+			summarizeBy: none
+			sourceColumn: trimestre_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column trimestre_nome
+			dataType: string
+			displayFolder: 03. Trimestre
+			summarizeBy: none
+			sourceColumn: trimestre_nome
+			sortByColumn: trimestre_num
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column trimestre_data_ini
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 03. Trimestre
+			summarizeBy: none
+			sourceColumn: trimestre_data_ini
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column trimestre_data_fim
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 03. Trimestre
+			summarizeBy: none
+			sourceColumn: trimestre_data_fim
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column ano_trimestre_nome
+			dataType: string
+			displayFolder: 03. Trimestre
+			summarizeBy: none
+			sourceColumn: ano_trimestre_nome
+			sortByColumn: ano_trimestre_key
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column semana_ano_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 05. Semana
+			summarizeBy: none
+			sourceColumn: semana_ano_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column dia_periodo
+			dataType: int64
+			formatString: 0
+			displayFolder: 06. Dia
+			summarizeBy: none
+			sourceColumn: dia_periodo
+
+			annotation SummarizationSetBy = Automatic
+
+		column dia_mes_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 06. Dia
+			summarizeBy: none
+			sourceColumn: dia_mes_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column dia_ano_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 06. Dia
+			summarizeBy: none
+			sourceColumn: dia_ano_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column dia_semana_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 06. Dia
+			summarizeBy: none
+			sourceColumn: dia_semana_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column dia_semana_nome
+			dataType: string
+			displayFolder: 06. Dia
+			summarizeBy: none
+			sourceColumn: dia_semana_nome
+			sortByColumn: dia_semana_num
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column dia_semana_nome_abrev
+			dataType: string
+			displayFolder: 06. Dia
+			summarizeBy: none
+			sourceColumn: dia_semana_nome_abrev
+			sortByColumn: dia_semana_num
+
+			changedProperty = SortByColumn
+
+			annotation SummarizationSetBy = Automatic
+
+		column ano_fiscal_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 08. Calendario Fiscal
+			summarizeBy: none
+			sourceColumn: ano_fiscal_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column ano_fiscal_ini
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 08. Calendario Fiscal
+			summarizeBy: none
+			sourceColumn: ano_fiscal_ini
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column ano_fiscal_fim
+			dataType: dateTime
+			formatString: Short Date
+			displayFolder: 08. Calendario Fiscal
+			summarizeBy: none
+			sourceColumn: ano_fiscal_fim
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column mes_fiscal_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 08. Calendario Fiscal
+			summarizeBy: none
+			sourceColumn: mes_fiscal_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column trimestre_fiscal_num
+			dataType: int64
+			formatString: 0
+			displayFolder: 08. Calendario Fiscal
+			summarizeBy: none
+			sourceColumn: trimestre_fiscal_num
+
+			annotation SummarizationSetBy = Automatic
+
+		column feriado
+			dataType: string
+			displayFolder: 07. Dias Uteis
+			summarizeBy: none
+			sourceColumn: feriado
+
+			annotation SummarizationSetBy = Automatic
+
+		column e_util
+			dataType: boolean
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			displayFolder: 07. Dias Uteis
+			summarizeBy: none
+			sourceColumn: e_util
+
+			annotation SummarizationSetBy = Automatic

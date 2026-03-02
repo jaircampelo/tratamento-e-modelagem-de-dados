@@ -1,0 +1,192 @@
+let
+
+    //COLUNA DE DATA
+    dateMinColumn = fato_vendas[data_venda],
+    dateMaxColumn = fato_vendas[data_venda],
+
+    //EXTRAI AS DATAS MÍNIMA E MÁXIMA DA fato_vendas E INDICA O MÊS DE INÍCIO DO ANO FISCAL
+    dateMin = List.Min(List.RemoveNulls(dateMinColumn)),
+    dateMax = List.Max(List.RemoveNulls(dateMaxColumn)),
+    mesIniAnoFiscal = 1,
+
+    //EXTRAI O INÍCIO DO ANO DA dateMin E O FIM DO ANO DA dateMax
+    dateStart = Date.StartOfYear(dateMin),
+    dateEnd = Date.EndOfYear(dateMax),
+
+    //CRIA TABELA DE FERIADOS
+
+        //CRIA LISTA DE ANOS
+        anosList = ({Date.Year(dateStart)..Date.Year(dateEnd)}),
+
+        //EXECUTA A CRIAÇÃO DA TABELA A PARTIR DO CONSUMO DA WEB, ITERANDO PARA CADA ANO DA LISTA
+        tbFeriadosPorAno =
+            List.Transform(
+                anosList,
+                (ano as number) =>
+                    let
+                        //CONSOME OS DADOS DE FERIADO DA WEB
+                        fonte = Web.BrowserContents("https://www.anbima.com.br/feriados/fer_nacionais/" & Text.From(ano) & ".asp"),
+
+                        //FAZ O TRATAMENTO DA TABELA DE FERIADO EXTRAÍDA
+                        tabelaCriada =
+                            Table.PromoteHeaders(
+                                Html.Table(
+                                    fonte,
+                                    {
+                                        {"Column1", "TABLE.interna > * > TR > :nth-child(1)"},
+                                        {"Column2", "TABLE.interna > * > TR > :nth-child(3)"}
+                                    },
+                                    [RowSelector="TABLE.interna > * > TR"]
+                                ),
+                                [PromoteAllScallars = true]
+                            ),
+                        tabelaRenomeada = Table.RenameColumns(tabelaCriada, {{"Data","data"},{"Feriado","feriado"}}),
+                        ajusteData =
+                            Table.TransformColumns(
+                                tabelaRenomeada,
+                                {{"data", each Text.ReplaceRange(_,Text.PositionOf(_,"/",1),1,"/20")}}
+                            ),
+                        tipoAlterado = Table.TransformColumnTypes(ajusteData, {{"data", type date}})
+                    in
+                        tipoAlterado
+            ),
+
+        //COMBINA AS TABELAS DE FERIADO CRIADAS EM UMA SÓ
+        tbFeriadosConsolidada = Table.Combine(tbFeriadosPorAno),
+
+    //DIFERENÇA ENTRE dateStart E dateEnd
+    dateDiff = Duration.TotalDays(dateEnd - dateStart) + 1,
+
+    //CRIA TABELA DE DATAS
+    dateList = 
+        List.Dates(
+            dateStart,
+            dateDiff,
+            #duration(1,0,0,0)
+        ),
+    dateTable = Table.FromList(dateList,Splitter.SplitByNothing(), type table [data = Date.Type],null,ExtraValues.Error),
+
+    //CRIA COLUNAS
+
+    ////COLUNAS CHAVE
+    data_key = Table.AddColumn(dateTable, "data_key", each Date.Year([data]) * 10000 + Date.Month([data]) * 100 + Date.DayOfYear([data]), Int64.Type),
+    ano_mes_key = Table.AddColumn(data_key, "ano_mes_key", each Date.Year([data]) * 100 + Date.Month([data]), Int64.Type),
+    ano_trimestre_key = Table.AddColumn(ano_mes_key, "ano_trimestre_key", each Date.Year([data]) * 10 + Date.QuarterOfYear([data]), Int64.Type),
+
+    ////COLUNAS ANO
+    ano_num = Table.AddColumn(ano_trimestre_key, "ano_num", each Date.Year([data]), Int64.Type),
+    ano_data_ini = Table.AddColumn(ano_num, "ano_data_ini", each Date.StartOfYear([data]), type date),
+    ano_data_fim = Table.AddColumn(ano_data_ini, "ano_data_fim", each Date.EndOfYear([data]), type date),
+
+    ////COLUNAS MÊS
+    mes_num = Table.AddColumn(ano_data_fim, "mes_num", each Date.Month([data]), Int64.Type),
+    mes_periodo = Table.AddColumn(mes_num, "mes_periodo", each (Date.Year([data]) - Date.Year(dateStart)) * 12 + Date.Month([data]), Int64.Type),
+    mes_data_ini = Table.AddColumn(mes_periodo, "mes_data_ini", each Date.StartOfMonth([data]), type date),
+    mes_data_fim = Table.AddColumn(mes_data_ini, "mes_data_fim", each Date.EndOfMonth([data]), type date),
+    mes_dias_qtd = Table.AddColumn(mes_data_fim, "mes_dias_qtd", each Date.DaysInMonth([data]), Int64.Type),
+    mes_nome = Table.AddColumn(mes_dias_qtd, "mes_nome", each Date.MonthName([data]), type text),
+    mes_nome_abrev = Table.AddColumn(mes_nome, "mes_nome_abrev", each Text.Start(Date.MonthName([data]),3), type text),
+    mes_ano_nome_abrev = Table.AddColumn(mes_nome_abrev, "mes_ano_nome_abrev", each Text.Start(Date.MonthName([data]),3) & "/" & Text.From(Date.Year([data])), type text),
+
+    ////COLUNAS TRIMESTRE
+    trimestre_num = Table.AddColumn(mes_ano_nome_abrev, "trimestre_num", each Date.QuarterOfYear([data]), Int64.Type),
+    trimestre_nome = Table.AddColumn(trimestre_num, "trimestre_nome", each "T" & Text.From(Date.QuarterOfYear([data])), type text),
+    trimestre_data_ini = Table.AddColumn(trimestre_nome, "trimestre_data_ini", each Date.StartOfQuarter([data]), type date),
+    trimestre_data_fim = Table.AddColumn(trimestre_data_ini, "trimestre_data_fim", each Date.EndOfQuarter([data]), type date),
+    ano_trimestre_nome = Table.AddColumn(trimestre_data_fim, "ano_trimestre_nome", each Text.From(Date.Year([data])) & " T" & Text.From(Date.QuarterOfYear([data])), type text),
+
+    ////COLUNAS SEMANA
+    semana_ano_num = Table.AddColumn(ano_trimestre_nome, "semana_ano_num", each Date.WeekOfYear([data]), Int64.Type),
+
+    ////COLUNAS DIA
+    dia_periodo = Table.AddColumn(semana_ano_num, "dia_periodo", each Duration.TotalDays([data] - dateStart) + 1, Int64.Type),
+    dia_mes_num = Table.AddColumn(dia_periodo, "dia_mes_num", each Date.Day([data]), Int64.Type),
+    dia_ano_num = Table.AddColumn(dia_mes_num, "dia_ano_num", each Date.DayOfYear([data]), Int64.Type),
+    dia_semana_num = Table.AddColumn(dia_ano_num, "dia_semana_num", each Date.DayOfWeek([data],Day.Sunday), Int64.Type),
+    dia_semana_nome = Table.AddColumn(dia_semana_num, "dia_semana_nome", each Date.DayOfWeekName([data]), type text),
+    dia_semana_nome_abrev =
+        Table.AddColumn(
+            dia_semana_nome, 
+            "dia_semana_nome_abrev", 
+            each Text.Replace(Text.Middle(Date.DayOfWeekName([data]),0,3),"á","a"), 
+            type text
+        ),
+
+    ////CALENDÁRIO FISCAL
+    ano_fiscal_num =
+        Table.AddColumn(
+            dia_semana_nome_abrev,
+            "ano_fiscal_num",
+            each
+                if Date.Month([data]) < mesIniAnoFiscal
+                    then Date.Year([data])
+                else Date.Year([data]) + 1,
+            Int64.Type
+        ),
+    ano_fiscal_ini = 
+        Table.AddColumn(
+            ano_fiscal_num,
+            "ano_fiscal_ini",
+            each
+                #date(
+                    if Date.Month([data]) < mesIniAnoFiscal
+                        then Date.Year([data])
+                    else Date.Year([data]) + 1,
+                    mesIniAnoFiscal,
+                    1
+                ),
+            type date
+        ),
+    ano_fiscal_fim =
+        Table.AddColumn(
+            ano_fiscal_ini,
+            "ano_fiscal_fim",
+            each
+                Date.EndOfYear(
+                    #date(
+                        if Date.Month([data]) < mesIniAnoFiscal
+                            then Date.Year([data])
+                        else Date.Year([data]) + 1,
+                        mesIniAnoFiscal,
+                        1
+                    )
+                ),
+            type date
+        ),
+    mes_fiscal_num = Table.AddColumn(ano_fiscal_fim, "mes_fiscal_num", each Number.Mod((Date.Month([data]) + (12 - mesIniAnoFiscal)),12)+1,Int64.Type),
+    trimestre_fiscal_num =
+        Table.AddColumn(
+            mes_fiscal_num,
+            "trimestre_fiscal_num",
+            each Number.RoundDown((Number.Mod((Date.Month([data]) + (12 - mesIniAnoFiscal)), 12) / 3) + 1),
+            Int64.Type
+        ),
+    
+    ////ADICIONA FERIADOS
+    feriados =
+        Table.ExpandTableColumn(
+            Table.NestedJoin(
+                trimestre_fiscal_num,
+                "data",
+                tbFeriadosConsolidada,
+                "data",
+                "tbFeriadosConsolidada",
+                JoinKind.LeftOuter
+            ),
+            "tbFeriadosConsolidada",
+            {"feriado"}
+        ),
+    
+    ////ADICIONA DIAS UTEIS
+    uteis =
+        Table.AddColumn(
+            feriados,
+            "e_util",
+            each
+                if [dia_semana_num] = 6 or [dia_semana_num] = 0 or [feriado] <> null
+                    then false
+                else true,
+            type logical
+        )
+in
+    uteis
