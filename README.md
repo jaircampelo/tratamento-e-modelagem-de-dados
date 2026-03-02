@@ -1,6 +1,6 @@
-# TRATAMENTO DE DADOS COM O POWER QUERY
+# TRATAMENTO E MODELAGEM DE DADOS
 
-Nesse projeto apresento soluções para tratameno de dados com o Power Query, dentre as etapas aplicadas no tratamento, destacam-se:
+Nesse projeto apresento soluções para tratameno de dados com o Power Quer Dentre as etapas aplicadas no tratamento, destacam-se:
 
 - Parametrização de *paths*
 
